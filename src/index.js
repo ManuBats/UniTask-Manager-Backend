@@ -4,9 +4,8 @@ const express = require('express');
 const cors = require('cors');
 const prisma = require('./config/database');
 
-const authRoutes = require('./routes/auth');
-const cursosRoutes = require('./routes/cursos');
-const actividadesRoutes = require('./routes/actividades');
+const apiRoutes = require('./routes/index');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,14 +14,15 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/cursos', cursosRoutes);
-app.use('/api/actividades', actividadesRoutes);
+app.use('/api', apiRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Error handler (must be after routes)
+app.use(errorHandler);
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
